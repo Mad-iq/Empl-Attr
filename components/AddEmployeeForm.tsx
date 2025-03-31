@@ -18,7 +18,6 @@ export default function AddEmployeeForm({ onClose }: { onClose: () => void }) {
     department: string;
     position: string;
     startdate: string | null; // Fix: Allow null for date fields
-    status: string; // Fix: Status should be a string
     employeeid: string;
     manager: string;
     employmenttype: string;
@@ -27,7 +26,7 @@ export default function AddEmployeeForm({ onClose }: { onClose: () => void }) {
     education: string;
     certifications: string;
     keyskills: string;
-    performanceRating: string;
+    performancerating: string;
     goals: string;
   };
 
@@ -40,7 +39,6 @@ export default function AddEmployeeForm({ onClose }: { onClose: () => void }) {
     department: "",
     position: "",
     startdate: null, // Fix: Initialize as null
-    status: "",
     employeeid: "",
     manager: "",
     employmenttype: "Full-time",
@@ -49,7 +47,7 @@ export default function AddEmployeeForm({ onClose }: { onClose: () => void }) {
     education: "",
     certifications: "",
     keyskills: "",
-    performanceRating: "",
+    performancerating: "",
     goals: "",
   });
 
@@ -109,7 +107,6 @@ export default function AddEmployeeForm({ onClose }: { onClose: () => void }) {
       department: formData.department?.trim() || null,
       position: formData.position?.trim() || null,
       startdate: formData.startdate || null, // Allow PostgreSQL to set default
-      status: formData.status?.trim() || null,
       manager: formData.manager?.trim() || null,
       employeeid: formData.employeeid?.trim() || null,
       employmenttype: ["Full-time", "Part-time", "Contract", "Intern"].includes(formData.employmenttype) 
@@ -120,7 +117,7 @@ export default function AddEmployeeForm({ onClose }: { onClose: () => void }) {
       education: formData.education?.trim() || null,
       certifications: formData.certifications?.trim() || null,
       keyskills: formData.keyskills?.trim() || null,
-      performanceRating: formData.performanceRating || null,
+      performancerating: formData.performancerating ? parseInt(formData.performancerating) : null,
       goals: formData.goals?.trim() || null,
     };
     
@@ -130,6 +127,7 @@ export default function AddEmployeeForm({ onClose }: { onClose: () => void }) {
     setLoading(false);
 
     if (error) {
+      console.log(JSON.stringify(dataToSubmit, null, 2));
       setError(error.message);
       return;
     }
@@ -145,7 +143,6 @@ export default function AddEmployeeForm({ onClose }: { onClose: () => void }) {
       department: "",
       position: "",
       startdate: null, // Fix: Reset to null
-      status: "",
       manager: "",
       employmenttype: "Full-time",
       salary: "",
@@ -153,7 +150,7 @@ export default function AddEmployeeForm({ onClose }: { onClose: () => void }) {
       education: "",
       certifications: "",
       keyskills: "",
-      performanceRating: "",
+      performancerating: "",
       goals: "",
     });
   };
@@ -264,8 +261,8 @@ export default function AddEmployeeForm({ onClose }: { onClose: () => void }) {
           <Label htmlFor="certifications">Certifications</Label>
           <Input id="certifications" name="certifications" value={formData.certifications} onChange={handleChange} required />
 
-          <Label htmlFor="performanceRating">Last Performance Rating</Label>
-          <Select value={formData.performanceRating} onValueChange={(value) => handleSelectChange("performanceRating", value)}>
+          <Label htmlFor="performancerating">Last Performance Rating</Label>
+          <Select value={formData.performancerating} onValueChange={(value) => handleSelectChange("performancerating", value)}>
             <SelectTrigger>
               <SelectValue placeholder="Select rating" />
             </SelectTrigger>
