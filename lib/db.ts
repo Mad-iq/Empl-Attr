@@ -1,11 +1,12 @@
-import { Pool } from "pg";
+import { createClient } from "@supabase/supabase-js";
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false, // Required for hosted PostgreSQL services like Supabase
-  },
-});
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
-export const query = (text: string, params?: any[]) => pool.query(text, params);
-
+export const fetchEmployees = async () => {
+  const { data, error } = await supabase.from("employees").select("*");
+  if (error) throw error;
+  return data;
+};
