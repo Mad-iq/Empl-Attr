@@ -1,11 +1,12 @@
 "use client"
 
 import type React from "react"
-
-import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { BarChart3, Bell, FileText, Home, LogOut, MessageSquare, Settings, User, Users } from "lucide-react"
+import { supabase } from "@/lib/supabase"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -28,10 +29,54 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 
+interface Employee {
+  name: string;
+  position: string;
+}
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const [notifications, setNotifications] = useState(3)
+  const [user, setUser] = useState<Employee | null>(null);
 
+
+  const router = useRouter()
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (!error) {
+      router.push("/login"); // Redirect to login
+    } else {
+      console.error("Logout failed:", error.message);
+    }
+  };
+  
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      // Get logged-in user session
+      const { data: session } = await supabase.auth.getSession();
+      if (!session?.session) return;
+
+      // Extract user email
+      const userEmail = session.session.user.email;
+
+      // Fetch user details from the employees table
+      const { data: employee, error } = await supabase
+        .from("employees")
+        .select("name, position") // Adjust column names as per your DB
+        .eq("email", userEmail)
+        .single();
+
+      if (error) console.error("Error fetching employee data:", error);
+      else setUser({ name: employee.name, position: employee.position }); // Ensure keys match Employee type
+    };
+
+    fetchUserData();
+  }, []);
+
+  
+  
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full">
@@ -118,14 +163,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
-                  <span className="text-sm font-medium">JD</span>
+                  <span className="text-sm font-medium">{user?.name ? user.name.charAt(0) : "U"}</span>
                 </div>
                 <div className="text-sm">
-                  <p className="font-medium">John Doe</p>
-                  <p className="text-muted-foreground">HR Manager</p>
+                  <p className="font-medium">{user ? user.name : "Loading..."}</p>
+                  <p className="text-muted-foreground">{user ? user.position : "Loading..."}</p>
                 </div>
+
               </div>
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" onClick={handleLogout}>
                 <LogOut className="h-5 w-5" />
               </Button>
             </div>
@@ -176,7 +222,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     <span>Settings</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleLogout}>
                     <span>Logout</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>

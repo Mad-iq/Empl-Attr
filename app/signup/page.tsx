@@ -6,7 +6,7 @@ import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { Users } from "lucide-react"
-
+import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -16,11 +16,28 @@ export default function SignupPage() {
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // In a real app, you would handle signup here
-    console.log("Signup submitted", { email, password, confirmPassword })
+  
+    if (password !== confirmPassword) {
+      alert("Passwords do not match!")
+      return
+    }
+  
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+    })
+  
+    if (error) {
+      alert(error.message) // Handle error
+      return
+    }
+  
+    alert("Signup successful! Check your email for confirmation.")
+    window.location.href = "/login"
   }
+  
 
   return (
     <div className="flex min-h-screen">
