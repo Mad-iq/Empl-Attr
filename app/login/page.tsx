@@ -6,7 +6,7 @@ import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { Users } from "lucide-react"
-
+import { supabase } from "@/lib/supabase"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
@@ -17,11 +17,23 @@ export default function LoginPage() {
   const [password, setPassword] = useState("")
   const [rememberMe, setRememberMe] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // In a real app, you would handle authentication here
-    window.location.href = "/dashboard"
+    
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
+  
+    if (error) {
+      alert(error.message) // Handle error
+      return
+    }
+  
+    window.location.href = "/dashboard" // Redirect on success
   }
+  
+  
 
   return (
     <div className="flex min-h-screen">
