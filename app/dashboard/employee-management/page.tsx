@@ -5,6 +5,8 @@ import AddEmployeeForm from "@/components/AddEmployeeForm";
 import { Eye, MoreHorizontal, Search, SlidersHorizontal, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ConfirmDeleteModal } from "@/components/confirmDeleteModal";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -25,6 +27,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { MoreVertical } from "lucide-react"
 type Employee = {
   employeeid: number;
   name: string;
@@ -34,7 +37,7 @@ type Employee = {
   employmenttype: string;
 };
 
-export default function EmployeeManagementPage() {
+export default function EmployeeManagementPage({ employee, refresh }: any) {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedDepartment, setSelectedDepartment] = useState("all");
@@ -59,6 +62,27 @@ export default function EmployeeManagementPage() {
       employee.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
       (selectedDepartment === "all" || employee.department === selectedDepartment)
   );
+
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  const handleDelete = async (employeeId: number) => {
+    try {
+      const res = await fetch(`/api/employees/${employeeId}`, {
+        method: "DELETE",
+      });
+  
+      if (res.ok) {
+        toast.success("Employee deleted successfully!");
+        // Remove the deleted employee from state
+        setEmployees((prev) => prev.filter(emp => emp.employeeid !== employeeId));
+      } else {
+        toast.error("Failed to delete employee.");
+      }
+    } catch (error) {
+      toast.error("Something went wrong.");
+    }
+  };
+  
 
   const departments = ["Engineering", "Sales", "Marketing", "Customer Support", "HR", "Finance", "Product"];
 
@@ -159,21 +183,24 @@ export default function EmployeeManagementPage() {
                             </Badge>
                           </TableCell>
                           <TableCell className="text-right">
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon" className="h-8 w-8">
-                                  <MoreHorizontal className="h-4 w-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem>
-                                  <Eye className="mr-2 h-4 w-4" />
-                                  View Details
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <button className="p-2 hover:bg-muted rounded-md">
+                                <MoreVertical className="h-5 w-5" />
+                              </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-40">
+                              <DropdownMenuItem onSelect={() => console.log("View Profile clicked")}>
+                                View Profile
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                onClick={() => handleDelete(employee.employeeid)}
+                              >
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                           </TableCell>
                         </TableRow>
                       ))
