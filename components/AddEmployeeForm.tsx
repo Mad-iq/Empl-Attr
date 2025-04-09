@@ -128,18 +128,70 @@ export default function AddEmployeeForm({ onClose, onAdd }: { onClose: () => voi
 
     const { error } = await supabase.from("employees").insert([dataToSubmit]);
 
-    setLoading(false);
-
     if (error) {
       console.log(JSON.stringify(dataToSubmit, null, 2));
       setError(error.message);
+      setLoading(false);
       return;
     }
+
+    await predictAttritionRisk(dataToSubmit);
 
     toast.success("Employee added successfully!");
     onAdd(); // Refetch the employee list
     onClose();
-    
+    setLoading(false);
+  };
+  
+  const predictAttritionRisk = async (employeeData : any) => {
+    try {
+      const age = calculateAge(employeeData.dob);
+      const modelInput = {
+        Age: age,
+        Department: employeeData.department,
+        Education: employeeData.education,
+        Gender: employeeData.gender,
+        JobRole: employeeData.position,
+        MonthlyIncome: parseInt(employeeData.salary),
+        PerformanceRating: parseInt(employeeData.performancerating),
+      };
+  
+      const response = await fetch("http://localhost:5000/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(modelInput),
+      });
+  
+      const result = await response.json();
+      console.log("Attrition Risk:", result);
+  
+      if (result.risk_score !== undefined) {
+        // 🔥 Save risk score to Supabase
+        const { error } = await supabase
+          .from("employees")
+          .update({ riskscore: result.risk_score })
+          .eq("employeeid", employeeData.employeeid);
+  
+        if (error) {
+          toast.error("Risk score update failed");
+          console.error(error.message);
+        } else {
+          toast.success(`Attrition Risk Score: ${result.risk_score}`);
+        }
+      }
+    } catch (err) {
+      toast.error("Failed to predict attrition risk.");
+      console.error(err);
+    }
+  };
+  
+  
+  const calculateAge = (dobStr: string) => {
+    const dob = new Date(dobStr);
+    const today = new Date();
+    const age = today.getFullYear() - dob.getFullYear();
+    const m = today.getMonth() - dob.getMonth();
+    return m < 0 || (m === 0 && today.getDate() < dob.getDate()) ? age - 1 : age;
   };
   
   
