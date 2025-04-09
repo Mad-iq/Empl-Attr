@@ -162,6 +162,8 @@ interface Employee {
   location?: string;
   startdate?: string;
   skills?: string;
+  manager?: string;
+  employmenttype?: string;
 }
 
 function EmployeeDetail({ employee }: { employee: Employee }) {
@@ -240,11 +242,11 @@ function EmployeeDetail({ employee }: { employee: Employee }) {
                     </div>
                     <div className="flex justify-between">
                       <dt className="text-sm font-medium text-muted-foreground">Manager</dt>
-                      <dd className="text-sm">John Smith</dd>
+                      <dd className="text-sm">{employee.manager}</dd>
                     </div>
                     <div className="flex justify-between">
                       <dt className="text-sm font-medium text-muted-foreground">Status</dt>
-                      <dd className="text-sm">Full-time</dd>
+                      <dd className="text-sm">{employee.employmenttype}</dd>
                     </div>
                   </dl>
                 </div>

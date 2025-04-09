@@ -1,11 +1,12 @@
 "use client";
-
+import {useRouter} from "next/navigation";
 import { useState, useEffect } from "react";
 import AddEmployeeForm from "@/components/AddEmployeeForm";
 import { Eye, MoreHorizontal, Search, SlidersHorizontal, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ConfirmDeleteModal } from "@/components/confirmDeleteModal";
+import EditEmployeeModal from "@/components/EditEmployeeModal";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -38,24 +39,29 @@ type Employee = {
 };
 
 export default function EmployeeManagementPage({ employee, refresh }: any) {
+  const router = useRouter();
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedDepartment, setSelectedDepartment] = useState("all");
   const [isAddEmployeeOpen, setIsAddEmployeeOpen] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+
 
   // Fetch employees from Supabase API
+  const fetchEmployees = async () => {
+    try {
+      const response = await fetch("/api/employees");
+      const data = await response.json();
+      setEmployees(data);
+    } catch (error) {
+      console.error("Error fetching employees:", error);
+    }
+  };
+  
   useEffect(() => {
-    const fetchEmployees = async () => {
-      try {
-        const response = await fetch("/api/employees");
-        const data = await response.json();
-        setEmployees(data);
-      } catch (error) {
-        console.error("Error fetching employees:", error);
-      }
-    };
     fetchEmployees();
-  }, []);
+  }, []);  
 
   const filteredEmployees = employees.filter(
     (employee) =>
@@ -83,12 +89,31 @@ export default function EmployeeManagementPage({ employee, refresh }: any) {
     }
   };
   
+  const handleEdit = (employee: Employee) => {
+    setSelectedEmployee(employee);
+    setEditModalOpen(true);
+  };
 
   const departments = ["Engineering", "Sales", "Marketing", "Customer Support", "HR", "Finance", "Product"];
 
   return (
     <div className="flex-1 w-full h-full">
       <div className="w-full h-full px-4 py-6 md:px-6 lg:px-8">
+      <EditEmployeeModal
+        isOpen={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        employee={selectedEmployee}
+        onUpdate={async () => {
+          try {
+            const res = await fetch("/api/employees");
+            const data = await res.json();
+            setEmployees(data);
+            toast.success("Employee updated successfully! 🎉");
+          } catch (error) {
+            toast.error("Failed to fetch updated data.");
+          }
+        }}
+      />
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <h2 className="text-3xl font-bold tracking-tight">Employee Management</h2>
@@ -108,7 +133,10 @@ export default function EmployeeManagementPage({ employee, refresh }: any) {
                   Enter the employee details below to add them to your organization.
                 </DialogDescription>
               </DialogHeader>
-              <AddEmployeeForm onClose={() => setIsAddEmployeeOpen(false)} />
+              <AddEmployeeForm
+                onClose={() => setIsAddEmployeeOpen(false)}
+                onAdd={fetchEmployees}
+              />
             </DialogContent>
           </Dialog>
         </div>
@@ -190,14 +218,20 @@ export default function EmployeeManagementPage({ employee, refresh }: any) {
                               </button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-40">
-                              <DropdownMenuItem onSelect={() => console.log("View Profile clicked")}>
-                                View Profile
-                              </DropdownMenuItem>
+                            <DropdownMenuItem onSelect={() => router.push(`/employee/${employee.employeeid}/view`)}>
+                              View Profile
+                            </DropdownMenuItem>
                               <DropdownMenuSeparator />
                               <DropdownMenuItem
                                 onClick={() => handleDelete(employee.employeeid)}
                               >
                                 Delete
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                onClick={() => handleEdit(employee)}
+                              >
+                                Edit
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>

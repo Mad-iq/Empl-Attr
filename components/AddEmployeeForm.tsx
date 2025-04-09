@@ -7,8 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/lib/supabase";
+import { toast } from "sonner";
 
-export default function AddEmployeeForm({ onClose }: { onClose: () => void }) {
+export default function AddEmployeeForm({ onClose, onAdd }: { onClose: () => void; onAdd: () => void }) {
   type EmployeeFormData = {
     name: string;
     email: string;
@@ -28,6 +29,7 @@ export default function AddEmployeeForm({ onClose }: { onClose: () => void }) {
     keyskills: string;
     performancerating: string;
     goals: string;
+    location: string;
   };
 
   const [formData, setFormData] = useState<EmployeeFormData>({
@@ -49,6 +51,7 @@ export default function AddEmployeeForm({ onClose }: { onClose: () => void }) {
     keyskills: "",
     performancerating: "",
     goals: "",
+    location: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -119,6 +122,7 @@ export default function AddEmployeeForm({ onClose }: { onClose: () => void }) {
       keyskills: formData.keyskills?.trim() || null,
       performancerating: formData.performancerating ? parseInt(formData.performancerating) : null,
       goals: formData.goals?.trim() || null,
+      location: formData.location?.trim() || null,
     };
     
 
@@ -132,27 +136,10 @@ export default function AddEmployeeForm({ onClose }: { onClose: () => void }) {
       return;
     }
 
+    toast.success("Employee added successfully!");
+    onAdd(); // Refetch the employee list
     onClose();
-    setFormData({
-      employeeid: "",
-      name: "",
-      email: "",
-      phone: "",
-      dob: null, // Fix: Reset to null
-      gender: "",
-      department: "",
-      position: "",
-      startdate: null, // Fix: Reset to null
-      manager: "",
-      employmenttype: "Full-time",
-      salary: "",
-      skills: "",
-      education: "",
-      certifications: "",
-      keyskills: "",
-      performancerating: "",
-      goals: "",
-    });
+    
   };
   
   
@@ -234,6 +221,15 @@ export default function AddEmployeeForm({ onClose }: { onClose: () => void }) {
             </SelectContent>
           </Select>
           
+          <Label htmlFor="location">Location</Label>
+          <Input
+            id="location"
+            name="location"
+            placeholder="e.g., Bangalore"
+            value={formData.location}
+            onChange={handleChange}
+          />
+
           <Label htmlFor="employmentType">Employment Type</Label>
           <Select value={formData.employmenttype} onValueChange={(value) => handleSelectChange("employmenttype", value)}>
             <SelectTrigger>
