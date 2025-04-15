@@ -1,5 +1,5 @@
 "use client";
-
+import { toast } from "sonner";   
 import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase"; 
 
 export default function EditEmployeeModal({ isOpen, onClose, employee, onUpdate }: any) {
   const [formData, setFormData] = useState<any>({});
@@ -38,6 +38,50 @@ export default function EditEmployeeModal({ isOpen, onClose, employee, onUpdate 
     setFormData((prev: any) => ({ ...prev, [name]: value }));
   };
 
+  const predictAttritionRisk = async (employeeData: { [key: string]: any }) => {
+    try {
+      const response = await fetch("http://localhost:5000/predict", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(employeeData),
+      });
+  
+      const result = await response.json();
+      console.log("Attrition Risk on Update:", result);
+  
+      if (result.risk_score !== undefined) {
+        // Update the employee with the new risk score in Supabase
+        const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+
+        const supabaseRes = await fetch(
+          `https://saunhcpgpeibfakyrhrq.supabase.co/rest/v1/employees?employeeid=eq.${employeeData.employeeid}`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              apikey: supabaseKey,
+              Authorization: `Bearer ${supabaseKey}`,
+            },
+            body: JSON.stringify({ riskscore: parseFloat((result.risk_score * 100).toFixed(4)) }),
+          }
+        );
+
+        const supabaseResBody = await supabaseRes.text();
+        console.log("🔁 Supabase Response:", supabaseRes.status, supabaseResBody);
+
+        if (!supabaseRes.ok) {
+          toast.error("⚠️ Risk score update failed in database.");
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to predict attrition risk.");
+    }
+  };
+  
+
   const handleSelectChange = (name: string, value: string) => {
     setFormData((prev: any) => ({ ...prev, [name]: value }));
   };
@@ -45,25 +89,45 @@ export default function EditEmployeeModal({ isOpen, onClose, employee, onUpdate 
   const handleSubmit = async () => {
     setLoading(true);
     const { employeeid, ...rest } = formData;
+  
     try {
+      // 1. Predict Attrition Risk
+      const response = await fetch("http://localhost:5000/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      const result = await response.json();
+      console.log("🧠 Attrition Prediction Result:", result);
+  
+      if (result.risk_score !== undefined) {
+        rest.riskscore = parseFloat((result.risk_score * 100).toFixed(4));
+      }
+  
+      // 2. PUT updated formData including risk to your backend API
       const res = await fetch(`/api/employees/${employeeid}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(rest),
       });
+  
       const data = await res.json();
       if (res.ok) {
         await onUpdate();
+        toast.success("Employee & risk score updated!");
         onClose();
       } else {
         setError(data.error);
       }
     } catch (err) {
-      setError("Update failed");
+      console.error(err);
+      setError("Update failed.");
+      toast.error("Update failed.");
     } finally {
       setLoading(false);
     }
   };
+  
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

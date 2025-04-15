@@ -1,4 +1,48 @@
 import os
+"""
+This Flask application serves as a backend for predicting employee attrition risk.
+It uses a pre-trained logistic regression model to predict the likelihood of an employee leaving
+based on various input features. The application provides endpoints for rendering a home page
+and for making predictions.
+
+Modules:
+- os: Provides functions for interacting with the operating system.
+- joblib: Used for loading pre-trained models and other serialized objects.
+- numpy: Used for numerical operations.
+- pandas: Used for data manipulation and analysis.
+- flask: Provides the web framework for building the application.
+- flask_cors: Enables Cross-Origin Resource Sharing (CORS) for the application.
+- random: Used for generating random default values for input features.
+
+Functions:
+- get_random_defaults(): Generates random default values for employee attributes.
+
+Routes:
+- `/`: Renders the home page (index.html).
+- `/predict`: Accepts POST requests with JSON data, processes the input, and returns a prediction
+    of whether the employee is likely to leave or not.
+
+Global Variables:
+- BASE_DIR: The base directory of the application.
+- MODEL_DIR: The directory where the pre-trained models are stored.
+- classifier: The pre-trained logistic regression model loaded using joblib.
+- scaler: The scaler object used for feature scaling, loaded using joblib.
+- feature_names: The list of feature names expected by the model, loaded using joblib.
+
+Usage:
+1. Start the Flask application by running the script.
+2. Access the home page at `http://localhost:5000/`.
+3. Send a POST request to `/predict` with JSON data containing employee attributes to get a prediction.
+
+Error Handling:
+- If an exception occurs during the prediction process, the `/predict` endpoint returns a JSON
+    response with an error message.
+
+Note:
+- The `get_random_defaults()` function is used to generate random default values for missing input
+    fields. This can be replaced with static default values by commenting out the function call and
+    uncommenting the static `default_values` dictionary.
+"""
 import joblib
 import numpy as np
 import pandas as pd

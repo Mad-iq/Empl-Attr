@@ -34,6 +34,30 @@ interface Employee {
   position: string;
 }
 
+/**
+ * DashboardLayout component serves as the main layout for the dashboard pages.
+ * It includes a sidebar for navigation, a header with notifications and user account options,
+ * and a main content area for rendering child components.
+ *
+ * @param {Object} props - The component props.
+ * @param {React.ReactNode} props.children - The child components to be rendered within the layout.
+ *
+ * @returns {JSX.Element} The rendered dashboard layout.
+ *
+ * @remarks
+ * - The layout includes a sidebar with navigation links to various dashboard sections such as
+ *   Employee Profiles, Employee Management, Attrition Analysis, Feedback, Reports, and Settings.
+ * - The sidebar footer displays the logged-in user's name and position, along with a logout button.
+ * - The header includes a notifications dropdown and a user account dropdown.
+ * - The component fetches user data from the Supabase backend and updates the state accordingly.
+ *
+ * @example
+ * ```tsx
+ * <DashboardLayout>
+ *   <DashboardContent />
+ * </DashboardLayout>
+ * ```
+ */
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const [notifications, setNotifications] = useState(3)
@@ -43,14 +67,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const router = useRouter()
 
   const handleLogout = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (!error) {
-      router.push("/login"); // Redirect to login
-    } else {
-      console.error("Logout failed:", error.message);
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (!error) {
+        router.push("/login"); // Redirect to login
+      } else {
+        console.error("Logout failed:", error.message);
+      }
+    } catch (err) {
+      console.error("An unexpected error occurred during logout:", err);
     }
   };
-  
+
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -75,8 +103,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     fetchUserData();
   }, []);
 
-  
-  
+
+
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full">

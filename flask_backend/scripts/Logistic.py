@@ -1,4 +1,37 @@
 # flask_backend/scripts/Logistic.py
+"""
+This script trains a logistic regression model to predict employee attrition using a given dataset.
+It performs the following steps:
+1. Loads the dataset from a specified file path.
+2. Drops irrelevant columns that do not contribute to the prediction.
+3. Encodes the target column ("Attrition") and categorical variables using one-hot encoding.
+4. Splits the data into training and testing sets.
+5. Scales the feature data using StandardScaler.
+6. Trains a logistic regression model on the scaled training data.
+7. Saves the trained model, scaler, and feature names to the "models" directory.
+
+Modules:
+    - os: For file and directory path manipulations.
+    - joblib: For saving and loading the model, scaler, and feature names.
+    - pandas: For data manipulation and preprocessing.
+    - sklearn.model_selection: For splitting the dataset into training and testing sets.
+    - sklearn.preprocessing: For scaling the feature data.
+    - sklearn.linear_model: For training the logistic regression model.
+
+Constants:
+    - BASE_DIR: The directory of the current script.
+    - PROJECT_DIR: The parent directory of the script directory.
+    - MODEL_DIR: The directory where the model, scaler, and feature names are saved.
+    - DATA_PATH: The file path to the dataset.
+
+Outputs:
+    - logistic_regression_model.pkl: The trained logistic regression model.
+    - scaler.pkl: The fitted StandardScaler object.
+    - feature_names.pkl: The list of feature names used in the model.
+
+Note:
+    Ensure the dataset file exists at the specified DATA_PATH before running the script.
+"""
 
 import os
 import joblib
