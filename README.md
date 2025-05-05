@@ -145,10 +145,10 @@ We love contributions! To contribute:
 
 - Push changes & open a Pull Request
 
-## Learnings
+## 💡 Learnings
 "Building this platform taught us real-world backend integration using Supabase and how ML can empower HR teams with actionable insights. From routing to prediction models — we aimed to deliver a tech-first HR solution."
 
-## Contact
+## 📬 Contact
 Developed by Debashrita Mandal, Akshat Jain, Anika Mariam, Bhawani Shankar Mandal, Ayushi Bhattacharyya
 
 Reach us at akjain2904@gmail.com
