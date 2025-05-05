@@ -28,7 +28,7 @@ A clean and professional **enterprise-grade layout** using **soft gradients**, *
 
 | Dashboard | Add Employee | Edit Employee | Prediction |
 |-----------|---------------|----------------|-------------|
-| ![Dashboard](./screenshots/dashboard.png) | ![Add](./screenshots/add.png) | ![Edit](./screenshots/edit.png) | ![Prediction](./screenshots/predict.png) |
+| ![Dashboard](./public/dashboard.png) | ![Add](./public/add.png) | ![Edit](./public/edit.png) | ![Employee Profiles](./public/profiles.png) | ![Employee Management](./public/management.png)
 
 > *(Ensure actual screenshots are placed in the `/screenshots/` folder)*
 
