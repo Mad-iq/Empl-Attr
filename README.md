@@ -27,10 +27,7 @@ A modern, full-stack platform designed to **manage employee data**, streamline *
 A clean and professional **enterprise-grade layout** using **soft gradients**, **material design components**, and **minimalist form inputs** — optimized for both desktop and mobile users.
 
 | Dashboard | Add Employee | Edit Employee | Profiles | Management |
-|-----------|---------------|----------------|-------------|
 | ![Dashboard](./public/dashboard.png) | ![Add](./public/add.png) | ![Edit](./public/edit.png) | ![Employee Profiles](./public/profiles.png) | ![Employee Management](./public/management.png)
-
-> *(Ensure actual screenshots are placed in the `/screenshots/` folder)*
 
 ---
 
