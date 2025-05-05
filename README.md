@@ -58,8 +58,6 @@ cd employee-management-attrition
 Create a .env.local file:
 
 ```env
-Copy
-Edit
 NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
@@ -67,14 +65,10 @@ ML_API_URL=http://localhost:5000/predict
 ```
 ### 3. Install Frontend Dependencies
 ```bash
-Copy
-Edit
 npm install
 ```
 ### 4. Run the Dev Server
 ```bash
-Copy
-Edit
 npm run dev
 ```
 Go to http://localhost:3000
@@ -85,15 +79,11 @@ Navigate to the ML backend folder (e.g., /ml-api)
 Install dependencies:
 
 ```bash
-Copy
-Edit
 pip install -r requirements.txt
 ```
 Run the Flask API:
 
 ```bash
-Copy
-Edit
 python app.py
 ```
 Make sure it runs on the port defined in ML_API_URL.
@@ -134,26 +124,26 @@ The ML model takes input features like:
 🔜 Deep Learning enhancement (TensorFlow/Keras)
 
 ## 📈 Roadmap
- Employee CRUD with Supabase
+ - Employee CRUD with Supabase
 
- Realtime Dashboard Integration
+ - Realtime Dashboard Integration
 
- ML Model Deployment to Production
+ - ML Model Deployment to Production
 
- Email Alerts for High Attrition Risk
+ - Email Alerts for High Attrition Risk
 
- Department-Wise Attrition Heatmaps
+ - Department-Wise Attrition Heatmaps
 
- Admin Approval Workflow for Edits
+ - Admin Approval Workflow for Edits
 
 ## 🤝 Contributing
 We love contributions! To contribute:
 
-Fork the repository
+- Fork the repository
 
-Create a feature branch: feature/your-idea
+- Create a feature branch: feature/your-idea
 
-Push changes & open a Pull Request
+- Push changes & open a Pull Request
 
 ## Learnings
 "Building this platform taught us real-world backend integration using Supabase and how ML can empower HR teams with actionable insights. From routing to prediction models — we aimed to deliver a tech-first HR solution."
